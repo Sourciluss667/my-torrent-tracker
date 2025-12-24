@@ -4,6 +4,7 @@
 
 #include "http_session.hpp"
 #include "http_parser.hpp"
+#include "../bencode/bencode.hpp"
 
 #include <spdlog/spdlog.h>
 
@@ -116,8 +117,10 @@ void HttpSession::handle_announce() {
 
     const auto peers = _peer_manager->get_peers(hex_info_hash, hex_peer_id);
 
-    spdlog::info("Peers: {}", peers.size());
+    std::vector<std::pair<std::string, std::string> > dict_items;
+    dict_items.emplace_back("interval", Bencode::encode_int(1800));
+    dict_items.emplace_back("peers", Bencode::encode_string(Bencode::encode_peers_compact(peers)));
 
-    _res.body() = "Tracker alive";
+    _res.body() = Bencode::encode_dict(dict_items);
     _res.prepare_payload();
 }
