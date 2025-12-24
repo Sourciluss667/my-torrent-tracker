@@ -9,8 +9,8 @@
 
 #include "../tools/hexify.hpp"
 
-HttpSession::HttpSession(tcp::socket socket)
-    : _socket(std::move(socket)) {
+HttpSession::HttpSession(tcp::socket socket, std::shared_ptr<PeerManager> peer_manager) : _socket(std::move(socket)),
+    _peer_manager(std::move(peer_manager)) {
 }
 
 void HttpSession::run() {
@@ -69,8 +69,6 @@ void HttpSession::handle_announce() {
     _res.set(http::field::content_type, "text/plain");
     _res.keep_alive(false);
 
-    _res.body() = "Tracker alive";
-
     AnnounceRequest announce;
 
     try {
@@ -84,6 +82,9 @@ void HttpSession::handle_announce() {
         return;
     }
 
+    const std::string hex_peer_id = Hexify::hexify(announce.peer_id);
+    const std::string hex_info_hash = Hexify::hexify(announce.info_hash);
+
     spdlog::info(
         "IP: {} | Port: {} | Uploaded: {} | Downloaded: {} | Left: {} | Event: {} | Peer ID: {} | Info Hash: {}",
         announce.ip,
@@ -92,9 +93,30 @@ void HttpSession::handle_announce() {
         announce.downloaded,
         announce.left,
         announce.event,
-        Hexify::hexify(announce.peer_id),
-        Hexify::hexify(announce.info_hash)
+        hex_peer_id,
+        hex_info_hash
     );
 
+    if (announce.event == "stopped") {
+        _peer_manager->remove_peer(hex_info_hash, hex_peer_id);
+    } else {
+        const PeerInfo peer_info{
+            announce.ip,
+            announce.port,
+            announce.uploaded,
+            announce.downloaded,
+            announce.left,
+            hex_peer_id,
+            std::time(nullptr)
+        };
+
+        _peer_manager->add_peer(hex_info_hash, peer_info);
+    }
+
+    const auto peers = _peer_manager->get_peers(hex_info_hash, hex_peer_id);
+
+    spdlog::info("Peers: {}", peers.size());
+
+    _res.body() = "Tracker alive";
     _res.prepare_payload();
 }

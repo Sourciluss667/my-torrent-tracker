@@ -7,7 +7,7 @@
 
 #include <spdlog/spdlog.h>
 
-HttpServer::HttpServer(unsigned short port) : _port(port) {
+HttpServer::HttpServer(const unsigned short port) : _port(port), _peer_manager(std::make_shared<PeerManager>()) {
 }
 
 void HttpServer::run() const {
@@ -17,11 +17,12 @@ void HttpServer::run() const {
     spdlog::info("HTTP Server listening on {}", _port);
 
     std::function<void()> do_accept;
-    do_accept = [ioc, acceptor, &do_accept]() {
+    do_accept = [ioc, acceptor, &do_accept, peer_manager = _peer_manager]() {
         acceptor->async_accept(
-            [ioc, acceptor, &do_accept](const boost::system::error_code &ec, tcp::socket socket) {
+            [ioc, acceptor, &do_accept, peer_manager](const boost::system::error_code &ec,
+                                                      tcp::socket socket) {
                 if (!ec) {
-                    std::make_shared<HttpSession>(std::move(socket))->run();
+                    std::make_shared<HttpSession>(std::move(socket), peer_manager)->run();
                 }
                 do_accept();
             });

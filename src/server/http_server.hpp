@@ -10,6 +10,8 @@
 #include <boost/beast.hpp>
 #include <boost/asio.hpp>
 
+#include "../peer/peer_manager.hpp"
+
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace asio = boost::asio;
@@ -26,6 +28,7 @@ public:
 
 private:
     unsigned short _port;
+    std::shared_ptr<PeerManager> _peer_manager;
 };
 
 #endif //MY_TORRENT_TRACKER_HTTP_SERVER_HPP

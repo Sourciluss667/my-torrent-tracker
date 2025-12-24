@@ -17,11 +17,12 @@ using tcp = asio::ip::tcp;
 
 class HttpSession : public std::enable_shared_from_this<HttpSession> {
 public:
-    explicit HttpSession(tcp::socket socket);
+    explicit HttpSession(tcp::socket socket, std::shared_ptr<PeerManager> peer_manager);
 
     void run();
 
 private:
+    std::shared_ptr<PeerManager> _peer_manager;
     tcp::socket _socket;
     beast::flat_buffer _buffer;
     HttpRequest _req;

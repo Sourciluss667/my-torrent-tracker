@@ -20,7 +20,9 @@ add_executable(my_torrent_tracker src/main.cpp
         src/server/http_parser.cpp
         src/server/http_parser.hpp
         src/tools/hexify.cpp
-        src/tools/hexify.hpp)
+        src/tools/hexify.hpp
+        src/peer/peer_manager.cpp
+        src/peer/peer_manager.hpp)
 
 target_link_libraries(my_torrent_tracker PRIVATE
         spdlog::spdlog
