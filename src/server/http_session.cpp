@@ -107,7 +107,8 @@ void HttpSession::handle_announce() {
             announce.downloaded,
             announce.left,
             hex_peer_id,
-            std::time(nullptr)
+            std::time(nullptr),
+            announce.left == 0
         };
 
         _peer_manager->add_peer(hex_info_hash, peer_info);

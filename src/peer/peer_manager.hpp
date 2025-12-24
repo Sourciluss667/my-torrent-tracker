@@ -20,6 +20,7 @@ struct PeerInfo {
     uint64_t left;
     std::string peer_id;
     time_t last_announce;
+    bool completed;
 };
 
 class PeerManager {

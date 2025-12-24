@@ -23,6 +23,7 @@ void PeerManager::add_peer(const std::string &info_hash, const PeerInfo &peer) {
         it->downloaded = peer.downloaded;
         it->left = peer.left;
         it->last_announce = peer.last_announce;
+        it->completed = peer.completed;
     } else {
         peer_list.push_back(peer);
     }
