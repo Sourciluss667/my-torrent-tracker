@@ -10,8 +10,9 @@
 
 #include "../tools/hexify.hpp"
 
-HttpSession::HttpSession(tcp::socket socket, std::shared_ptr<PeerManager> peer_manager) : _socket(std::move(socket)),
-    _peer_manager(std::move(peer_manager)) {
+HttpSession::HttpSession(tcp::socket socket, std::shared_ptr<PeerManager> peer_manager) : _peer_manager(
+        std::move(peer_manager)),
+    _socket(std::move(socket)) {
 }
 
 void HttpSession::run() {
